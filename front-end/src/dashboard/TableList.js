@@ -13,9 +13,7 @@ function TableList({ table, loadDashboard, error, date }) {
 
 
 async function handleClick(){
-   if(window.confirm(
-          "Is this table ready to seat new guests? This cannot be undone."
-      ) ){
+   if(window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
         finishHandler();
       }
 }
@@ -23,9 +21,8 @@ async function handleClick(){
 async function finishHandler(){
   const { signal } = new AbortController();
   await  unassignTable(table.table_id, signal)
-    //.then(loadDashboard);
-    history.push("/dashboard")
-      //return () => abort();
+  loadDashboard()
+    // history.push("/dashboard")
 }
 
 

@@ -4,7 +4,7 @@ import { cancelReservation } from '../../utils/api'
 
 
 
-function ReservationInfo({ reservation, loadDashboard }) {
+function ReservationInfo({ reservation, loadDashboard, displayTables }) {
 // const history = useHistory()
 
 

@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import TableList from "./TableList";
 import ReservationInfo from "../layout/reservations/ReservationInfo";
 
-
 /**
  * Defines the dashboard page.
  * @param date
@@ -20,45 +19,6 @@ function Dashboard({ date }) {
   const [resError, setResError] = useState(null);
   const [tablesError, setTablesError] = useState(null);
   const [tables, setTables] = useState([]);
-  //const [dateShown, setDateShown] = useState(date)
- 
-  // //load Reservations
-  // useEffect(() => {
-  //   const abortController = new AbortController();
-
-  //   async function loadDashboad(){
-      
-  //     try {
-  //       setResError(null);
-  //       const reservationsResponse = await listReservations({ date }, abortController.signal);
-  //       setReservations(reservationsResponse);
-  //     }catch (resError){
-  //       setReservations([]);
-  //       setResError(resError);
-  //     }
-  //   }
-  //   loadDashboad();
-  //   return () => abortController.abort();
-  // }, [date]);
-
-  // //load tables
-  // useEffect(() => {
-  //   const abortController = new AbortController();
-
-  //   async function loadTables(){
-  //     try {
-  //       setResError(null);
-  //       const tablesResponse = await listTables(abortController.signal);
-  //       setTables(tablesResponse);
-  //     }catch (resError){
-  //       setTables([]);
-  //       setResError(resError);
-  //     }
-  //   }
-  //   loadTables();
-  //   return () => abortController.abort();
-  // }, []);
-
 
   useEffect(loadDashboard, [date]);
 
@@ -67,11 +27,11 @@ function Dashboard({ date }) {
 
     setResError(null);
     setTablesError(null);
-    setReservations([])
+    setReservations([]);
 
     listReservations({ date: date }, abortController.signal)
       .then(setReservations)
-      .catch(setResError);
+      .catch(console.log);
 
     listTables(abortController.signal)
       .then((tables) =>
@@ -83,7 +43,15 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-
+  const displayTables = () => {
+    const abortController = new AbortController();
+    listTables(abortController.signal)
+    .then((tables) =>
+      tables.sort((tableA, tableB) => tableA.table_id - tableB.table_id)
+    )
+    .then(setTables)
+    .catch(setTablesError);
+  }
 
   return (
     <main>
@@ -92,13 +60,16 @@ function Dashboard({ date }) {
         <h4 className="mb-0">Reservations for {date}</h4>
       </div>
       <div>
-          <ErrorAlert error={resError} /> 
-        </div>
+        <ErrorAlert error={resError} />
+      </div>
       <div>
-        <table>
-          <thead>
-            <tr>
-            <th>ID</th>
+        {!reservations.length ? (
+          <p>No Reservations</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Phone Number</th>
@@ -109,42 +80,47 @@ function Dashboard({ date }) {
                 <th>Seat</th>
                 <th>Edit</th>
                 <th>Cancel</th>
-            </tr>
-          </thead>
-          {!reservations.length ? (
-            <p>No Reservations</p>
-          ) : (
+              </tr>
+            </thead>
             <tbody>
               {reservations.map((reservation, index) => (
-                <ReservationInfo reservation={reservation} loadDashboard={loadDashboard} />
+                <ReservationInfo
+                  reservation={reservation}
+                  loadDashboard={loadDashboard}
+                  displayTables={displayTables}
+                />
               ))}
             </tbody>
-          )}
-        </table>
+          </table>
+        )}
       </div>
       <div>
         <Link to={`/dashboard?date=${previous(date)}`}>
           <button>Previous</button>
-        </Link> 
-         <Link to={`/dashboard?date=${today()}`}>
+        </Link>
+        <Link to={`/dashboard?date=${today()}`}>
           <button>Today</button>
         </Link>
         <Link to={`/dashboard?date=${next(date)}`}>
-          <button >Next</button>
+          <button>Next</button>
         </Link>
       </div>
 
       <div>
         <h4 className="mb-0">Table List</h4>
         {tables.map((table, index) => (
-
-        <TableList key={table.table_id} table={table} error={tablesError} loadDashboard={loadDashboard} date={date} />
+          <TableList
+            key={table.table_id}
+            table={table}
+            error={tablesError}
+            loadDashboard={loadDashboard}
+            date={date}
+          />
         ))}
       </div>
       {/* {JSON.stringify(reservations)} */}
     </main>
   );
-} 
-
+}
 
 export default Dashboard;
