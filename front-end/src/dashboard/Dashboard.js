@@ -43,24 +43,11 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  const displayTables = () => {
-    const abortController = new AbortController();
-    listTables(abortController.signal)
-    .then((tables) =>
-      tables.sort((tableA, tableB) => tableA.table_id - tableB.table_id)
-    )
-    .then(setTables)
-    .catch(setTablesError);
-  }
-
   return (
     <main>
       <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for {date}</h4>
-      </div>
-      <div>
-        <ErrorAlert error={resError} />
       </div>
       <div>
         {!reservations.length ? (
@@ -87,7 +74,6 @@ function Dashboard({ date }) {
                 <ReservationInfo
                   reservation={reservation}
                   loadDashboard={loadDashboard}
-                  displayTables={displayTables}
                 />
               ))}
             </tbody>
@@ -118,7 +104,6 @@ function Dashboard({ date }) {
           />
         ))}
       </div>
-      {/* {JSON.stringify(reservations)} */}
     </main>
   );
 }

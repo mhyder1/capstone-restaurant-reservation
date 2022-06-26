@@ -104,11 +104,21 @@ function tableStatus(req, res, next){
 }
 
 //middleware checks if table is occupied
+// function tableOccupied(req, res, next){
+//   const { status } = res.locals.table
+//   if(status === "occupied"){
+//     return next()
+//   }else{
+//     return next ({
+//       status: 400,
+//       message: `Table is not occupied.`
+//     })
+//   }
+// }
+
 function tableOccupied(req, res, next){
-  const { status } = res.locals.table
- // console.log(status )
-  if(status === "occupied"){
-    //console.log("table is free", "----------")
+  const { reservation_id } = res.locals.table
+  if(reservation_id){
     return next()
   }else{
     return next ({
@@ -158,20 +168,15 @@ async function seatTable(req,res){
     res.json({ data: updatedTable })
 }
 
-
-
-
-
 // finish an occupied table
 async function finish(req, res) {
-  const { table_id } = req.params;
   const { table } = res.locals;
   const updatedTableData = {
       ...table,
+      reservation_id: null,
       status: "free"
   }
   const updatedTable = await service.finish(updatedTableData);
-  // set reservation status to "finished" using reservation id
   const updatedReservation = {
       status: "finished", 
       reservation_id: table.reservation_id,
